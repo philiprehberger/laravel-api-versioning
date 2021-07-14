@@ -23,6 +23,12 @@ class ApiVersion
     {
         $version = $this->resolveVersion($request);
 
+        // Resolve aliases before validation
+        $resolved = self::resolveAlias($version);
+        if ($resolved !== null) {
+            $version = $resolved;
+        }
+
         $supportedVersions = $this->supportedVersions();
 
         if (! in_array($version, $supportedVersions, strict: true)) {
@@ -117,6 +123,26 @@ class ApiVersion
     protected function latestVersion(): string
     {
         return (string) config('api-versioning.latest_version', 'v1');
+    }
+
+    /**
+     * Get the configured version aliases.
+     *
+     * @return array<string, string>
+     */
+    public static function aliases(): array
+    {
+        return (array) config('api-versioning.aliases', []);
+    }
+
+    /**
+     * Resolve an alias to its version string, or null if not found.
+     */
+    public static function resolveAlias(string $alias): ?string
+    {
+        $aliases = self::aliases();
+
+        return $aliases[$alias] ?? null;
     }
 
     /**

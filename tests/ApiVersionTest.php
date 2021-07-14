@@ -218,4 +218,52 @@ class ApiVersionTest extends TestCase
         $this->assertNull($response->headers->get('X-API-Version'));
         $this->assertNull($response->headers->get('X-API-Deprecated'));
     }
+
+    // ---------------------------------------------------------------------------
+    // Alias Tests
+    // ---------------------------------------------------------------------------
+
+    public function test_aliases_returns_configured_aliases(): void
+    {
+        config(['api-versioning.aliases' => ['latest' => 'v3', 'stable' => 'v2']]);
+
+        $aliases = ApiVersion::aliases();
+
+        $this->assertSame(['latest' => 'v3', 'stable' => 'v2'], $aliases);
+    }
+
+    public function test_aliases_returns_empty_array_when_none_configured(): void
+    {
+        config(['api-versioning.aliases' => []]);
+
+        $this->assertSame([], ApiVersion::aliases());
+    }
+
+    public function test_resolve_alias_returns_version_for_configured_alias(): void
+    {
+        config(['api-versioning.aliases' => ['latest' => 'v3', 'stable' => 'v2']]);
+
+        $this->assertSame('v3', ApiVersion::resolveAlias('latest'));
+        $this->assertSame('v2', ApiVersion::resolveAlias('stable'));
+    }
+
+    public function test_resolve_alias_returns_null_for_unconfigured_alias(): void
+    {
+        config(['api-versioning.aliases' => ['latest' => 'v3']]);
+
+        $this->assertNull(ApiVersion::resolveAlias('nope'));
+    }
+
+    public function test_middleware_resolves_alias_to_version(): void
+    {
+        config(['api-versioning.aliases' => ['latest' => 'v3']]);
+
+        $request = Request::create('/api/users', 'GET');
+        $request->headers->set('X-API-Version', 'latest');
+
+        $response = $this->runMiddleware($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('v3', $response->headers->get('X-API-Version'));
+    }
 }

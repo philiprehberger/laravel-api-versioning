@@ -1,11 +1,18 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to `laravel-api-versioning` will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.1.0] - 2026-03-22
+
+### Added
+- Version alias support with configurable alias-to-version mappings
+- `aliases()` method to retrieve configured version aliases
+- `resolveAlias()` method to resolve an alias to its version string
 
 ## [1.0.4] - 2026-03-17
 
