@@ -3,6 +3,7 @@
 [![Tests](https://github.com/philiprehberger/laravel-api-versioning/actions/workflows/tests.yml/badge.svg)](https://github.com/philiprehberger/laravel-api-versioning/actions/workflows/tests.yml)
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/philiprehberger/laravel-api-versioning.svg)](https://packagist.org/packages/philiprehberger/laravel-api-versioning)
 [![License](https://img.shields.io/github/license/philiprehberger/laravel-api-versioning)](LICENSE)
+[![Sponsor](https://img.shields.io/badge/sponsor-GitHub%20Sponsors-ec6cb9)](https://github.com/sponsors/philiprehberger)
 
 Laravel middleware for API versioning with multi-source resolution from headers, Accept vendor types, and URL path segments.
 
