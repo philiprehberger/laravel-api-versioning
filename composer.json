@@ -2,7 +2,9 @@
     "name": "philiprehberger/laravel-api-versioning",
     "description": "Laravel middleware for API versioning with multi-source resolution from headers, Accept vendor types, and URL path segments.",
     "keywords": ["laravel", "api", "versioning", "middleware", "rest"],
+    "type": "library",
     "license": "MIT",
+    "homepage": "https://github.com/philiprehberger/laravel-api-versioning",
     "authors": [
         {
             "name": "Philip Rehberger",
@@ -36,6 +38,11 @@
                 "PhilipRehberger\\ApiVersioning\\ApiVersioningServiceProvider"
             ]
         }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "lint": "vendor/bin/pint",
+        "analyse": "vendor/bin/phpstan analyse"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

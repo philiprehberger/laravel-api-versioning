@@ -189,6 +189,15 @@ When a version is detected but is not in `supported_versions`, the middleware re
 }
 ```
 
+## Development
+
+```bash
+composer install
+vendor/bin/phpunit
+vendor/bin/pint --test
+vendor/bin/phpstan analyse
+```
+
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md).
