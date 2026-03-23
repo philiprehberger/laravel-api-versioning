@@ -86,4 +86,19 @@ return [
     |
     */
     'response_headers' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Version Aliases
+    |--------------------------------------------------------------------------
+    |
+    | Map friendly alias names to version strings. When a resolved version
+    | matches an alias key, the middleware will transparently replace it with
+    | the version string it points to.
+    |
+    | Example: 'latest' => 'v2' lets clients send X-API-Version: latest
+    | and have it treated as X-API-Version: v2.
+    |
+    */
+    'aliases' => [],
 ];

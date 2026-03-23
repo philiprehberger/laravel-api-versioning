@@ -82,9 +82,36 @@ $version = ApiVersion::current($request); // e.g. 'v2'
 | Method / Concept | Description |
 |------------------|-------------|
 | `ApiVersion::current(Request $request)` | Get the resolved API version for the current request |
-| `ApiVersion` middleware | Resolves version, sets request attribute, adds response headers |
+| `ApiVersion::aliases()` | Get the configured version aliases as an associative array |
+| `ApiVersion::resolveAlias(string $alias)` | Resolve an alias to its version string, or `null` if not found |
+| `ApiVersion` middleware | Resolves version (with alias support), sets request attribute, adds response headers |
 | `X-API-Version` response header | The resolved version for each request |
 | `X-API-Deprecated` response header | `true` / `false` — whether this version is deprecated |
+
+### Version Aliases
+
+Map friendly names to version strings so clients can request `latest` or `stable` instead of a specific version number:
+
+```php
+// config/api-versioning.php
+
+'aliases' => [
+    'latest' => 'v2',
+    'stable' => 'v1',
+],
+```
+
+When the middleware resolves a version that matches an alias key, it transparently replaces it with the target version. For example, sending `X-API-Version: latest` is treated as `X-API-Version: v2`.
+
+You can also resolve aliases programmatically:
+
+```php
+use PhilipRehberger\ApiVersioning\ApiVersion;
+
+ApiVersion::aliases();                // ['latest' => 'v2', 'stable' => 'v1']
+ApiVersion::resolveAlias('latest');   // 'v2'
+ApiVersion::resolveAlias('unknown');  // null
+```
 
 ### Response Headers
 
