@@ -47,7 +47,7 @@ class ApiVersion
 
         if (config('api-versioning.response_headers', true)) {
             $response->headers->set('X-API-Version', $version);
-            $response->headers->set('X-API-Deprecated', $this->isDeprecated($version) ? 'true' : 'false');
+            $response->headers->set('X-API-Deprecated', self::isDeprecated($version) ? 'true' : 'false');
         }
 
         return $response;
@@ -66,15 +66,19 @@ class ApiVersion
         }
 
         // Priority 2: Accept header vendor type
-        $accept = $request->header('Accept', '');
+        $accept = (string) $request->header('Accept', '');
+        $customPattern = config('api-versioning.accept_header_pattern');
         $vendorName = preg_quote((string) config('api-versioning.vendor_name', 'api'), '/');
-        if (preg_match('/application\/vnd\.'.$vendorName.'\.(v\d+)\+json/', $accept, $matches)) {
+        $acceptPattern = is_string($customPattern) && $customPattern !== ''
+            ? $customPattern
+            : '/application\/vnd\.'.$vendorName.'\.(v\d+(?:\.\d+){0,2})\+json/';
+        if ($accept !== '' && @preg_match($acceptPattern, $accept, $matches) === 1 && isset($matches[1])) {
             return $matches[1];
         }
 
         // Priority 3: URL path segment
         $path = $request->path();
-        if (preg_match('/^api\/(v\d+)\//', $path, $matches)) {
+        if (preg_match('/^api\/(v\d+(?:\.\d+){0,2})\//', $path, $matches)) {
             return $matches[1];
         }
 
@@ -88,7 +92,7 @@ class ApiVersion
      * A version is deprecated if it appears in the explicit deprecated_versions
      * list, or if it is not the configured latest_version.
      */
-    protected function isDeprecated(string $version): bool
+    public static function isDeprecated(string $version): bool
     {
         $deprecatedVersions = config('api-versioning.deprecated_versions', []);
 
@@ -96,7 +100,7 @@ class ApiVersion
             return true;
         }
 
-        return $version !== $this->latestVersion();
+        return $version !== (string) config('api-versioning.latest_version', 'v1');
     }
 
     /**

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-04-06
+
+### Added
+- Public static `ApiVersion::isDeprecated(string $version)` helper for checking version deprecation outside the middleware
+- SemVer-style version matching (`v1.2`, `v1.2.3`) in URL path and Accept header resolvers
+- `accept_header_pattern` config option for overriding the default Accept header version regex
+- `pint.json` rules: `declare_strict_types` and alphabetical `ordered_imports`
+- `phpunit.xml` `<php>` env block (`APP_ENV`, `DB_CONNECTION`, `CACHE_DRIVER`)
+- Pull request template checklist item for `vendor/bin/phpstan analyse`
+
 ## [1.1.1] - 2026-03-31
 
 ### Changed

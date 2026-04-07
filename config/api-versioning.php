@@ -67,6 +67,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Accept Header Pattern
+    |--------------------------------------------------------------------------
+    |
+    | Optional custom regex used to extract the version from the Accept header.
+    | When null, the middleware falls back to the default vendor type pattern:
+    |
+    |   application/vnd.{vendor_name}.{version}+json
+    |
+    | When set, this regex is used instead. The first capture group must
+    | contain the version string. Example:
+    |
+    |   '/application\/vnd\.myapp\+json;\s*version=(v\d+(?:\.\d+){0,2})/'
+    |
+    */
+    'accept_header_pattern' => null,
+
+    /*
+    |--------------------------------------------------------------------------
     | Version Header Name
     |--------------------------------------------------------------------------
     |
