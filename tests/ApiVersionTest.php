@@ -254,6 +254,99 @@ class ApiVersionTest extends TestCase
         $this->assertNull(ApiVersion::resolveAlias('nope'));
     }
 
+    // ---------------------------------------------------------------------------
+    // isDeprecated() Tests
+    // ---------------------------------------------------------------------------
+
+    public function test_is_deprecated_returns_true_for_explicit_deprecated_version(): void
+    {
+        config(['api-versioning.deprecated_versions' => ['v1', 'v2']]);
+
+        $this->assertTrue(ApiVersion::isDeprecated('v1'));
+        $this->assertTrue(ApiVersion::isDeprecated('v2'));
+    }
+
+    public function test_is_deprecated_returns_true_for_non_latest_version(): void
+    {
+        // latest_version is v3 in defineEnvironment
+        $this->assertTrue(ApiVersion::isDeprecated('v1'));
+        $this->assertTrue(ApiVersion::isDeprecated('v2'));
+    }
+
+    public function test_is_deprecated_returns_false_for_latest_version(): void
+    {
+        $this->assertFalse(ApiVersion::isDeprecated('v3'));
+    }
+
+    // ---------------------------------------------------------------------------
+    // SemVer Extraction Tests
+    // ---------------------------------------------------------------------------
+
+    public function test_resolves_semver_version_from_url_path(): void
+    {
+        config(['api-versioning.supported_versions' => ['v1', 'v1.2.3']]);
+
+        $request = Request::create('/api/v1.2.3/users', 'GET');
+
+        $response = $this->runMiddleware($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('v1.2.3', $response->headers->get('X-API-Version'));
+    }
+
+    public function test_resolves_semver_version_from_accept_header(): void
+    {
+        config(['api-versioning.supported_versions' => ['v1', 'v2.1']]);
+
+        $request = Request::create('/api/users', 'GET');
+        $request->headers->set('Accept', 'application/vnd.api.v2.1+json');
+
+        $response = $this->runMiddleware($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('v2.1', $response->headers->get('X-API-Version'));
+    }
+
+    public function test_malformed_accept_header_falls_through_to_default(): void
+    {
+        $request = Request::create('/api/users', 'GET');
+        $request->headers->set('Accept', 'not/a-valid header @@@');
+
+        $response = $this->runMiddleware($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('v1', $response->headers->get('X-API-Version'));
+    }
+
+    public function test_leading_zero_version_via_header(): void
+    {
+        config(['api-versioning.supported_versions' => ['v1', 'v01']]);
+
+        $request = Request::create('/api/users', 'GET');
+        $request->headers->set('X-API-Version', 'v01');
+
+        $response = $this->runMiddleware($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('v01', $response->headers->get('X-API-Version'));
+    }
+
+    public function test_custom_accept_header_pattern(): void
+    {
+        config([
+            'api-versioning.supported_versions' => ['v1', 'v2'],
+            'api-versioning.accept_header_pattern' => '/application\/json;\s*version=(v\d+(?:\.\d+){0,2})/',
+        ]);
+
+        $request = Request::create('/api/users', 'GET');
+        $request->headers->set('Accept', 'application/json; version=v2');
+
+        $response = $this->runMiddleware($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('v2', $response->headers->get('X-API-Version'));
+    }
+
     public function test_middleware_resolves_alias_to_version(): void
     {
         config(['api-versioning.aliases' => ['latest' => 'v3']]);
